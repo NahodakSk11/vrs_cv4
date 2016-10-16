@@ -29,6 +29,27 @@
 /* Includes */
 #include <stddef.h>
 #include "stm32l1xx.h"
+#include <stm32l1xx_gpio.h> // pre istotu sme pridali knižnicu GPIO
+
+void delay(unsigned int i) //nas casovac/spomalovac
+{
+	for (; i; i--)
+		;
+}
+
+void PA5_config() // funkcia no konfiguraciu vistupu na pin 5 gpioa periferie (ledka)
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef gpioInitStruct;
+	gpioInitStruct.GPIO_Pin = GPIO_Pin_5;
+	gpioInitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	gpioInitStruct.GPIO_OType = GPIO_OType_PP;
+	gpioInitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	gpioInitStruct.GPIO_Speed = GPIO_Speed_40MHz;
+
+	GPIO_Init(GPIOA, &gpioInitStruct);
+}
 
 void adc_init(void) {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -70,49 +91,49 @@ void adc_init(void) {
 
 int main(void) {
 	adc_init();
+	PA5_config();
 	while (1) {
 		ADC_SoftwareStartConv(ADC1);
 		while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) {
 		}
 		int AD_value = ADC_GetConversionValue(ADC1); // do AD_value sa mi zapisuje hodnota vystupu z tlacidiel
-
-		return 0;
 	}
+	return 0;
 }
 
 #ifdef  USE_FULL_ASSERT
 
-	/**
-	 * @brief  Reports the name of the source file and the source line number
-	 *   where the assert_param error has occurred.
-	 * @param  file: pointer to the source file name
-	 * @param  line: assert_param error line source number
-	 * @retval None
-	 */
-	void assert_failed(uint8_t* file, uint32_t line)
-	{
-		/* User can add his own implementation to report the file name and line number,
-		 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+/**
+ * @brief  Reports the name of the source file and the source line number
+ *   where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t* file, uint32_t line)
+{
+	/* User can add his own implementation to report the file name and line number,
+	 ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 
-		/* Infinite loop */
-		while (1)
-		{
-		}
+	/* Infinite loop */
+	while (1)
+	{
 	}
+}
 #endif
 
-	/*
-	 * Minimal __assert_func used by the assert() macro
-	 * */
-	void __assert_func(const char *file, int line, const char *func,
-			const char *failedexpr) {
-		while (1) {
-		}
+/*
+ * Minimal __assert_func used by the assert() macro
+ * */
+void __assert_func(const char *file, int line, const char *func,
+		const char *failedexpr) {
+	while (1) {
 	}
+}
 
-	/*
-	 * Minimal __assert() uses __assert__func()
-	 * */
-	void __assert(const char *file, int line, const char *failedexpr) {
-		__assert_func(file, line, NULL, failedexpr);
-	}
+/*
+ * Minimal __assert() uses __assert__func()
+ * */
+void __assert(const char *file, int line, const char *failedexpr) {
+	__assert_func(file, line, NULL, failedexpr);
+}
