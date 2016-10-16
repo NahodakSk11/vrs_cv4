@@ -96,8 +96,38 @@ int main(void) {
 		ADC_SoftwareStartConv(ADC1);
 		while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) {
 		}
-		int AD_value = ADC_GetConversionValue(ADC1); // do AD_value sa mi zapisuje hodnota vystupu z tlacidiel
+		int AD_value = ADC_GetConversionValue(ADC1); // do AD_value  sa mi zapisuje hodnota vystupu z tlacidiel
+
+		// èas kde pozorujem ktore tlacidlo je stlacene a podla toho nastavujem roznu rychlost blikania ledky
+		//ak tlacidlo drzim stlacene tak ledka blika nizsie nastavenou rychlostou
+		//pokial nedrzim tlacidlo tak sa ledka vypne
+		//pre jednotlive tlacidla sme urcili rozmedzie pre AD_value +-cca 5.
+		//pre tlacidlo 1 (najblizsie k dratom) to boli hodnoti cca v zormedzi 4046 až 4049
+		if (AD_value > 4040 && AD_value < 4055) {
+			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+			delay(25000);
+		}
+		//tlacidlo 2
+		else if (AD_value > 4015 && AD_value < 4025) {
+			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+			delay(50000);
+		}
+		//tlacidlo 3
+		else if (AD_value > 3925 && AD_value < 3945) {
+			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+			delay(75000);
+		}
+		//tlacidlo 4
+		else if (AD_value > 3705 && AD_value < 3720) {
+			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
+			delay(100000);
+		}
+		// nic nie je zatlacene
+		else {
+			GPIO_ResetBits(GPIOA, GPIO_Pin_5);
+		}
 	}
+
 	return 0;
 }
 
